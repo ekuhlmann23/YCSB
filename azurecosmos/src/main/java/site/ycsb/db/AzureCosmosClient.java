@@ -159,7 +159,6 @@ public class AzureCosmosClient extends DB {
     // Connection properties
     String primaryKey = this.getStringProperty("azurecosmos.primaryKey", null);
     String managedIdentityClientId = this.getStringProperty("azurecosmos.managedIdentityClientId", null);
-
     if (isNullOrEmpty(primaryKey) && isNullOrEmpty(managedIdentityClientId)) {
       throw new DBException("Missing primaryKey and managedIdentityClientId required to connect to the database.");
     }
@@ -248,7 +247,7 @@ public class AzureCosmosClient extends DB {
 
       CosmosClientBuilder builder = new CosmosClientBuilder()
           .endpoint(uri)
-          .credential(new DefaultAzureCredentialBuilder().build())
+          .credential(new DefaultAzureCredentialBuilder().managedIdentityClientId(managedIdentityClientId).build())
           .throttlingRetryOptions(retryOptions)
           .consistencyLevel(consistencyLevel)
           .userAgentSuffix(userAgent);
@@ -720,5 +719,9 @@ public class AzureCosmosClient extends DB {
           .publishPercentileHistogram()
           .register(this.azureMonitorMeterRegistry);
     }
+  }
+
+  private boolean isNullOrEmpty(String str) {
+    return str == null || str.isEmpty();
   }
 }
