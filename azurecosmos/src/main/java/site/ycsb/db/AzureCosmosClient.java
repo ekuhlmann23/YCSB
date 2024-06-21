@@ -35,6 +35,7 @@ import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlParameter;
 import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -157,8 +158,10 @@ public class AzureCosmosClient extends DB {
 
     // Connection properties
     String primaryKey = this.getStringProperty("azurecosmos.primaryKey", null);
-    if (primaryKey == null || primaryKey.isEmpty()) {
-      throw new DBException("Missing primary key required to connect to the database.");
+    String managedIdentityClientId = this.getStringProperty("azurecosmos.managedIdentityClientId", null);
+
+    if (isNullOrEmpty(primaryKey) && isNullOrEmpty(managedIdentityClientId)) {
+      throw new DBException("Missing primaryKey and managedIdentityClientId required to connect to the database.");
     }
 
     String uri = this.getStringProperty("azurecosmos.uri", null);
@@ -243,8 +246,12 @@ public class AzureCosmosClient extends DB {
           AzureCosmosClient.maxDegreeOfParallelism, AzureCosmosClient.maxBufferedItemCount,
           AzureCosmosClient.preferredPageSize);
 
-      CosmosClientBuilder builder = new CosmosClientBuilder().endpoint(uri).key(primaryKey)
-          .throttlingRetryOptions(retryOptions).consistencyLevel(consistencyLevel).userAgentSuffix(userAgent);
+      CosmosClientBuilder builder = new CosmosClientBuilder()
+          .endpoint(uri)
+          .credential(new DefaultAzureCredentialBuilder().build())
+          .throttlingRetryOptions(retryOptions)
+          .consistencyLevel(consistencyLevel)
+          .userAgentSuffix(userAgent);
 
       if (useGateway) {
         builder = builder.gatewayMode(gatewayConnectionConfig);
