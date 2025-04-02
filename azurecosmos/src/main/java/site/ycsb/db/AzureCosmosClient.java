@@ -86,7 +86,7 @@ public class AzureCosmosClient extends DB {
   private static final int DEFAULT_MAX_BUFFERED_ITEM_COUNT = 0;
   private static final int DEFAULT_PREFERRED_PAGE_SIZE = -1;
   private static final int DEFAULT_DIAGNOSTICS_LATENCY_THRESHOLD_IN_MS = -1;
-  private static final boolean DEFAULT_INCLUDE_EXCEPTION_STACK_IN_LOG = false;
+  private static final boolean DEFAULT_INCLUDE_EXCEPTION_STACK_IN_LOG = true;
   private static final String DEFAULT_USER_AGENT = "azurecosmos-ycsb";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AzureCosmosClient.class);
